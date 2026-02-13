@@ -6,18 +6,22 @@ import os, random
 router = Router()
 FONT = "images/Montserrat-Regular.ttf"
 
+
 def base_screen(w=1080, h=1900):
     img = Image.new("RGB", (w, h), "#0b0f14")
     d = ImageDraw.Draw(img)
     return img, d
 
+
 def rounded(d, xy, r, fill):
     d.rounded_rectangle(xy, r, fill=fill)
+
 
 def check_icon(d, x, y):
     d.ellipse([x, y, x+36, y+36], fill="#1f3d2b")
     d.line([x+10, y+20, x+17, y+27], fill="#4ADE80", width=4)
     d.line([x+17, y+27, x+28, y+10], fill="#4ADE80", width=4)
+
 
 # ================= SUCCESS / SUC =================
 
@@ -25,9 +29,9 @@ def check_icon(d, x, y):
 async def suc(message: Message):
     try:
         _, data = message.text.split("/suc", 1)
-        user, balance, amount, card = [x.strip() for x in data.split("|")]
+        user, balance, amount, card = [x.strip() for x in data.split(",")]
     except:
-        await message.answer("Format:\n/suc Name | Balance | Amount | Card")
+        await message.answer("Формат:\n/suc Имя, Баланс, Сумма, Карта")
         return
 
     img, d = base_screen()
@@ -36,11 +40,9 @@ async def suc(message: Message):
     mid = ImageFont.truetype(FONT, 32)
     small = ImageFont.truetype(FONT, 24)
 
-    # Header
     d.text((60, 50), "CryptoX", fill="#60A5FA", font=title)
     d.text((900, 50), user, fill="white", font=mid)
 
-    # Balance card
     rounded(d, [60, 130, 1020, 430], 50, "#121826")
     d.text((120, 180), "Available Balance", fill="#9CA3AF", font=small)
     d.text((120, 240), f"${balance}", fill="white", font=big)
@@ -51,13 +53,11 @@ async def suc(message: Message):
     rounded(d, [520, 320, 880, 390], 30, "#1f2937")
     d.text((700, 345), "Deposit", fill="white", font=mid, anchor="mm")
 
-    # Verified line
     d.text((120, 470),
            "● Account verified   ● KYC verified   ● Network online",
            fill="#4ADE80",
            font=small)
 
-    # History
     y = 540
     d.text((60, y), "Withdrawal History", fill="white", font=mid)
     y += 60
@@ -86,9 +86,12 @@ async def suc(message: Message):
 async def bal(message: Message):
     try:
         _, data = message.text.split("/bal", 1)
-        user, balance, failed = [x.strip() for x in data.split("|")]
+        user, balance, failed, success = [x.strip() for x in data.split(",")]
     except:
-        await message.answer("Format:\n/bal Name | Balance | Failed")
+        await message.answer(
+            "Формат:\n/bal Имя, Баланс, Неудачная_сумма, Успешная_операция\n\n"
+            "Пример:\n/bal Alex, 12500, 15000, 2000"
+        )
         return
 
     img, d = base_screen()
@@ -97,21 +100,34 @@ async def bal(message: Message):
     mid = ImageFont.truetype(FONT, 32)
     small = ImageFont.truetype(FONT, 24)
 
+    # Header
     d.text((60, 50), "CryptoX", fill="#60A5FA", font=title)
     d.text((900, 50), user, fill="white", font=mid)
 
+    # Balance Card
     rounded(d, [60, 130, 1020, 430], 50, "#121826")
     d.text((120, 180), "Available Balance", fill="#9CA3AF", font=small)
     d.text((120, 240), f"${balance}", fill="white", font=big)
 
+    # History Title
     y = 520
     d.text((60, y), "Transaction History", fill="white", font=mid)
     y += 60
 
+    # ❌ Failed
     d.ellipse([60, y, 96, y+36], fill="#3b1111")
     d.line([70, y+18, 86, y+18], fill="#FF6C6C", width=4)
     d.text((120, y), f"- ${failed}", fill="#FF6C6C", font=mid)
     d.text((900, y), "Failed", fill="#FF6C6C", font=small)
+
+    y += 90
+
+    # ✅ Success
+    d.ellipse([60, y, 96, y+36], fill="#1f3d2b")
+    d.line([70, y+20, 78, y+28], fill="#4ADE80", width=4)
+    d.line([78, y+28, 92, y+12], fill="#4ADE80", width=4)
+    d.text((120, y), f"+ ${success}", fill="#4ADE80", font=mid)
+    d.text((900, y), "Completed", fill="#4ADE80", font=small)
 
     os.makedirs("images", exist_ok=True)
     path = "images/balance.png"
