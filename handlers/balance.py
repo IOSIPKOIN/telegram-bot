@@ -1,7 +1,6 @@
 from aiogram import Router
 from aiogram.types import Message
 from aiogram.filters import Command
-
 from render import render_html
 
 router = Router()
@@ -14,7 +13,7 @@ async def bal(message: Message):
         user, balance, failed, success = [x.strip() for x in data.split(",")]
     except:
         await message.answer(
-            "Формат:\n/bal Имя, Баланс, Неудачная_сумма, Успешная_операция\n\n"
+            "Формат:\n/bal Имя, Баланс, Failed, Success\n\n"
             "Пример:\n/bal Alex, 12500, 5400, 2000"
         )
         return
